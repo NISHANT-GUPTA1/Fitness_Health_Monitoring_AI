@@ -21,6 +21,7 @@ This AI-powered fitness app is designed to break common barriers in digital fitn
 
 🏋 *Workout Planner* - Create personalized workout routines  
 
+![1](https://github.com/user-attachments/assets/da0e9c58-91f3-4f1b-97b6-69ec4ff9416d)
 
 
 📊 *Fitness Tracker* - Monitor your progress and fitness metrics  
