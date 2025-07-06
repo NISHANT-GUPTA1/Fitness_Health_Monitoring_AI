@@ -51,7 +51,7 @@ cd Fitness_Health_Monitoring_AI
 
 
 2. Install dependencies:
-bash
+
 npm install
 # or
 pnpm install
