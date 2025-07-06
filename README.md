@@ -93,22 +93,22 @@ bash
 # Run the SQL setup script in your preferred database management system
 # File: scripts/database_setup.sql
 
-
 ## Project Structure
 
-text
-├── app/                    # Next.js app directory
-│   ├── components/         # React components
-│   ├── contexts/          # React contexts
+```bash
+├── app/                  # Next.js app directory
+│   ├── components/       # React components
+│   ├── contexts/         # React contexts
 │   ├── i18n/             # Internationalization configs
 │   └── globals.css       # Global styles
-├── components/            # Reusable UI components
+├── components/           # Reusable UI components
 ├── hooks/                # Custom React hooks
 ├── lib/                  # Utility functions
 ├── public/               # Static assets
-│   └── images/          # Gym equipment images
+│   └── images/           # Gym equipment images
 ├── scripts/              # Backend and database scripts
-└── styles/              # Additional styling
+└── styles/               # Additional styling
+```
 
 
 ## Components
