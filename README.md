@@ -128,4 +128,4 @@ Project Link: [https://github.com/NISHANT-GUPTA1/Fitness_Health_Monitoring_AI](h
 
 ---
 
-[⬆ Back to Top](#fitness-health-monitoring-ai)\
+[⬆ Back to Top](#fitness-health-monitoring-ai)
