@@ -141,7 +141,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-Your Name - [@NISHANT-GUPTA1](https://github.com/NISHANT-GUPTA1)
+Your Name - pentabits
 
 Project Link: [(https://fitnesshealthmonitoringai.netlify.app/)]
 
