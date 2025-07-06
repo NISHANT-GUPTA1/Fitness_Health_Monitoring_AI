@@ -20,11 +20,23 @@ A comprehensive AI-powered fitness and health monitoring application built with 
 
 🏋 *Workout Planner* - Create personalized workout routines  
 
+![ss5](https://github.com/user-attachments/assets/3ce409fb-0782-452e-b868-4bc5a216d948)
+
 📊 *Fitness Tracker* - Monitor your progress and fitness metrics  
+
+![ss3](https://github.com/user-attachments/assets/e166a4fd-1d47-4da4-b742-0bd77d56b24b)
+
 🏃 *Daily Exercises* - Track daily exercise activities  
 🧘 *Posture Checker* - AI-powered posture analysis  
 🤝 *Partner Finder* - Find workout partners in your area  
+
+![ss2](https://github.com/user-attachments/assets/c9e584f7-0699-47ff-88df-8cfda9a4e77f)
+
 💪 *Gym Machine Guide* - Learn how to use gym equipment properly  
+
+
+![ss1](https://github.com/user-attachments/assets/04bd67eb-d922-4181-a8d3-0f2aa4fd6bbb)
+
 👤 *User Profile* - Manage your personal fitness profile  
 🌍 *Internationalization* - Multi-language support  
 
