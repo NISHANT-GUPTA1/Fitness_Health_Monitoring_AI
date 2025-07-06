@@ -39,6 +39,8 @@ This AI-powered fitness app is designed to break common barriers in digital fitn
 ![ss1](https://github.com/user-attachments/assets/04bd67eb-d922-4181-a8d3-0f2aa4fd6bbb)
 
 👤 *User Profile* - Manage your personal fitness profile  
+![ss8](https://github.com/NISHANT-GUPTA1/Fitness_Health_Monitoring_AI/blob/289d9f6fcee79ae83ff904cc67a3f4a7c2a630c8/public/images/Screenshot%202025-07-06%20174307.png)
+
 🌍 *Internationalization* - Multi-language support  
 ![ss8](https://github.com/NISHANT-GUPTA1/Fitness_Health_Monitoring_AI/blob/3c4e748ed0c7d61dd5b09ea0b823de45759ca728/public/images/image.png)
 
