@@ -124,7 +124,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 Your Name - [@NISHANT-GUPTA1](https://github.com/NISHANT-GUPTA1)
 
-Project Link: [https://github.com/NISHANT-GUPTA1/Fitness_Health_Monitoring_AI](https://github.com/NISHANT-GUPTA1/Fitness_Health_Monitoring_AI)
+Project Link: [(https://fitnesshealthmonitoringai.netlify.app/)]
 
 ---
 
