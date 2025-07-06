@@ -39,6 +39,7 @@ A comprehensive AI-powered fitness and health monitoring application built with 
 
 👤 *User Profile* - Manage your personal fitness profile  
 🌍 *Internationalization* - Multi-language support  
+![ss8](https://github.com/NISHANT-GUPTA1/Fitness_Health_Monitoring_AI/blob/3c4e748ed0c7d61dd5b09ea0b823de45759ca728/public/images/image.png)
 
 ## Tech Stack
 
