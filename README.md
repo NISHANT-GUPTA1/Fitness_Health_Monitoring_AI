@@ -19,6 +19,7 @@ A comprehensive AI-powered fitness and health monitoring application built with 
 ## Features
 
 🏋 *Workout Planner* - Create personalized workout routines  
+
 📊 *Fitness Tracker* - Monitor your progress and fitness metrics  
 🏃 *Daily Exercises* - Track daily exercise activities  
 🧘 *Posture Checker* - AI-powered posture analysis  
