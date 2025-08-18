@@ -1,6 +1,6 @@
 #  AI Fitness App – Inclusive, Intelligent, and Adaptive Training
 This AI-powered fitness app is designed to break common barriers in digital fitness. It supports multiple languages, making fitness accessible to users from diverse backgrounds. The app offers personalized workout plans based on user goals, including home workouts, yoga, and cultural fitness styles. Real-time motion feedback via the phone camera ensures correct form and reduces injury risk. An integrated AI chatbot provides 24/7 support, personalized tips, and day-specific guidance, creating a truly smart and inclusive fitness companion.
-
+           
 
 
 ## 📑 Table of Contents
@@ -18,6 +18,7 @@ This AI-powered fitness app is designed to break common barriers in digital fitn
 - [Contact](#contact)
 
 ## Features
+
 
 👤 User Profile - Manage your personal fitness profile  
 
@@ -156,4 +157,5 @@ Project Link: [(https://fitnesshealthmonitoringai.netlify.app/)]
 ---
 
 [⬆ Back to Top](#fitness-health-monitoring-ai)
+
 
