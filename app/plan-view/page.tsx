@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useWorkout } from "../contexts/WorkoutContext"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -87,7 +87,7 @@ interface GeneratedPlan {
   recommendations: Recommendations
 }
 
-export default function PlanViewPage() {
+function PlanViewContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { savePlan: contextSavePlan, startPlan: contextStartPlan, savedPlans } = useWorkout()
@@ -99,6 +99,9 @@ export default function PlanViewPage() {
   const [completedWorkouts, setCompletedWorkouts] = useState<Set<string>>(new Set())
 
   useEffect(() => {
+    // Guard against SSR - only run in browser
+    if (typeof window === 'undefined') return
+
     // Get plan from localStorage or URL params
     const planData = localStorage.getItem('generatedPlan')
     if (planData) {
@@ -177,11 +180,13 @@ export default function PlanViewPage() {
     }
     
     contextStartPlan(workoutPlan)
-    localStorage.setItem('workoutProgress', JSON.stringify({
-      startDate: new Date().toISOString(),
-      completedWorkouts: [],
-      currentWeek: 1
-    }))
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('workoutProgress', JSON.stringify({
+        startDate: new Date().toISOString(),
+        completedWorkouts: [],
+        currentWeek: 1
+      }))
+    }
     setIsActive(true)
     alert('Plan started! Track your progress in the tracker section.')
   }
@@ -197,9 +202,11 @@ export default function PlanViewPage() {
     setCompletedWorkouts(newCompleted)
     
     // Save to localStorage
-    const progress = JSON.parse(localStorage.getItem('workoutProgress') || '{}')
-    progress.completedWorkouts = Array.from(newCompleted)
-    localStorage.setItem('workoutProgress', JSON.stringify(progress))
+    if (typeof window !== 'undefined') {
+      const progress = JSON.parse(localStorage.getItem('workoutProgress') || '{}')
+      progress.completedWorkouts = Array.from(newCompleted)
+      localStorage.setItem('workoutProgress', JSON.stringify(progress))
+    }
   }
 
   if (!plan) {
@@ -535,5 +542,19 @@ export default function PlanViewPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function PlanViewPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-3xl font-bold mb-4">Loading Plan...</h1>
+        </div>
+      </div>
+    }>
+      <PlanViewContent />
+    </Suspense>
   )
 }
