@@ -2,11 +2,13 @@ import type { Metadata } from 'next'
 import './globals.css'
 import I18nProvider from './components/I18nProvider'
 import { WorkoutProvider } from './contexts/WorkoutContext'
+import { AccessibilityProvider } from './contexts/AccessibilityContext'
 import { Toaster } from 'sonner'
+import { ThemeProvider } from '@/components/theme-provider'
 
 export const metadata: Metadata = {
-  title: 'AI Fitness App',
-  description: 'Your AI-powered fitness companion for a healthier lifestyle.',
+  title: 'FEFE - Fitness for Everyone',
+  description: 'Designed for Every Body, Every Ability. Your inclusive fitness companion for adaptive workouts, personalized training, and wellness tracking.',
   generator: 'v0.dev',
 }
 
@@ -16,14 +18,23 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
-        <I18nProvider>
-          <WorkoutProvider>
-            {children}
-            <Toaster position="top-right" richColors />
-          </WorkoutProvider>
-        </I18nProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <I18nProvider>
+            <AccessibilityProvider>
+              <WorkoutProvider>
+                {children}
+                <Toaster position="top-right" richColors />
+              </WorkoutProvider>
+            </AccessibilityProvider>
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

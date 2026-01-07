@@ -1,7 +1,7 @@
 import i18n from "i18next"
 import { initReactI18next } from "react-i18next"
 
-// Translation resources
+// Define translations
 const resources = {
   en: {
     translation: {
@@ -11,26 +11,26 @@ const resources = {
       error: "Error",
       success: "Success",
       cancel: "Cancel",
-      save: "Save",
-      edit: "Edit",
-      delete: "Delete",
-      close: "Close",
-      back: "Back",
-      next: "Next",
-      previous: "Previous",
-      search: "Search",
-      filter: "Filter",
-      all: "All",
-      none: "None",
-      yes: "Yes",
-      no: "No",
-      today: "Today",
-      yesterday: "Yesterday",
-      tomorrow: "Tomorrow",
-      minutes: "minutes",
-      min: "min",
-      cal: "cal",
-      days_ago: "days ago",
+  save: "Save",
+  edit: "Edit",
+  delete: "Delete",
+  close: "Close",
+  back: "Back",
+  next: "Next",
+  previous: "Previous",
+  search: "Search",
+  filter: "Filter",
+  all: "All",
+  none: "None",
+  yes: "Yes",
+  no: "No",
+  today: "Today",
+  yesterday: "Yesterday",
+  tomorrow: "Tomorrow",
+  minutes: "minutes",
+  min: "min",
+  cal: "cal",
+  days_ago: "days ago",
 
       // Navigation
       dashboard: "Dashboard",
@@ -451,19 +451,43 @@ const resources = {
       renegade_rows: "Renegade Rows",
       turkish_getups: "Turkish Get-ups",
 
+      // Find Gym
+      find_gym: "Find a Gym",
+      search_gyms: "Search gyms by name or location...",
+      found_gyms: "Found ${count} gyms near you",
+      no_gyms_found: "No gyms match your filters",
+      any_distance: "Any distance",
+      any_rating: "Any rating",
+      distance: "Distance",
+      mile: "mile",
+      miles: "miles",
+      stars: "stars",
+      map: "Map View",
+      map_placeholder: "Map View",
+      selected_gym_info: "Selected gym information",
+      select_gym: "Select a gym to see details",
+      getting_location: "Getting your location...",
+      select_gym_view: "Select a gym to view details",
+      call: "Call",
+      get_pass: "Get Free Pass",
+      subscriptions: "Membership Options",
+      subscriptions_from: "Memberships from",
+      view_details: "View Details",
+      monthly: "month",
+      
       // New Daily Workout Names
-      gym_power_session: "Gym Power Session",
-      cardio_blast: "Cardio Blast",
-      morning_yoga_flow: "Morning Yoga Flow",
-      functional_fitness: "Functional Fitness",
-      upper_body_focus: "Upper Body Focus",
+      "Gym Power Session": "Gym Power Session",
+      "Cardio Blast": "Cardio Blast",
+      "Morning Yoga Flow": "Morning Yoga Flow",
+      "Functional Fitness": "Functional Fitness",
+      "Upper Body Focus": "Upper Body Focus",
 
       // Equipment Types (only new ones)
-      gym_required: "Gym Required",
-      yoga_mat: "Yoga Mat Only",
-      minimal_equipment: "Minimal Equipment",
-      bench_barbell: "Bench & Barbell",
-      dip_station: "Dip Station",
+      "Gym Required": "Gym Required",
+      "Yoga Mat Only": "Yoga Mat Only",
+      "Minimal Equipment": "Minimal Equipment",
+      "Bench & Barbell": "Bench & Barbell",
+      "Dip Station": "Dip Station",
 
       // Workout Types (only new ones)
       functional: "Functional",
@@ -593,8 +617,8 @@ const resources = {
       continue_plan: "Continue with your active plan!",
       estimated_calories: "Est. calories",
       no_plans_yet: "No workout plans yet",
-      create_first_plan: "Create your first personalized workout plan to get started",
-    },
+      create_first_plan: "Create your first personalized workout plan to get started"
+    }
   },
   hi: {
     translation: {
@@ -1279,9 +1303,9 @@ const resources = {
       pike_pushups: "Pompes Pike",
       cat_cow_stretch: "Étirement Chat-Vache",
       downward_dog: "Chien Tête en Bas",
-      pigeon_pose: "Posture du Pigeon",
-    },
-  },
+      pigeon_pose: "Posture du Pigeon"
+    }
+  }
 }
 
 i18n.use(initReactI18next).init({

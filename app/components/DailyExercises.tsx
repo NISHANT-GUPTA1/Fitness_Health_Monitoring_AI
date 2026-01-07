@@ -16,7 +16,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Clock, Target, Zap, Play, RotateCcw, CheckCircle, Timer, Camera } from "lucide-react"
-import PostureChecker from "./PostureChecker"
 
 interface Exercise {
   name: string
@@ -48,7 +47,6 @@ export default function DailyExercises() {
   const [exerciseTimer, setExerciseTimer] = useState(0)
   const [isResting, setIsResting] = useState(false)
   const [completedExercises, setCompletedExercises] = useState<number[]>([])
-  const [showPostureChecker, setShowPostureChecker] = useState(false)
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null)
 
   // Generate different workouts based on day of week for variety
@@ -59,38 +57,38 @@ export default function DailyExercises() {
     // Morning Workout - varies by day
     currentDay % 2 === 0 ? {
       id: 1,
-      name: t("gym_power_session"),
+      name: "Gym Power Session",
       type: t("strength"),
       duration: 35,
       difficulty: t("intermediate"),
       calories: 280,
-      equipment: t("gym_required"),
+      equipment: "Gym Required",
       exercises: [
         {
-          name: t("treadmill_warmup"),
+          name: "Treadmill Warmup",
           duration: 300, // 5 minutes
           rest: 60,
-          instructions: t("treadmill_warmup_instructions"),
-          tips: t("treadmill_warmup_tips"),
+          instructions: "Start with 5 minutes of light jogging to warm up your muscles",
+          tips: "Keep a steady pace and focus on your breathing",
           muscles: [t("cardiovascular"), t("legs")],
           equipment: t("treadmill"),
         },
         {
-          name: t("bench_press"),
+          name: "Bench Press",
           duration: 180, // 3 minutes (3 sets)
           rest: 90,
-          instructions: t("bench_press_instructions"),
-          tips: t("bench_press_tips"),
+          instructions: "Lie on bench, lower bar to chest, press up with control",
+          tips: "Keep your feet on the ground and core engaged throughout",
           muscles: [t("chest"), t("shoulders"), t("triceps")],
           equipment: t("bench_barbell"),
         },
         {
-          name: t("lat_pulldown_machine"),
+          name: "Lat Pulldown Machine",
           duration: 180,
           rest: 90,
-          instructions: t("lat_pulldown_instructions"),
-          tips: t("lat_pulldown_tips"),
-          muscles: [t("lats"), t("biceps"), t("rear_delts")],
+          instructions: "Sit upright, pull bar down to upper chest with wide grip",
+          tips: "Focus on squeezing your shoulder blades together",
+          muscles: ["Lats", "Biceps", "Rear Delts"],
           equipment: t("lat_pulldown"),
         },
         {
@@ -260,12 +258,12 @@ export default function DailyExercises() {
     // Functional/Bodyweight Workout
     currentDay % 3 === 0 ? {
       id: 3,
-      name: t("functional_fitness"),
+      name: "Functional Fitness",
       type: t("functional"),
       duration: 20,
       difficulty: t("intermediate"),
       calories: 180,
-      equipment: t("minimal_equipment"),
+      equipment: "Minimal Equipment",
       exercises: [
         {
           name: t("jump_rope"),
@@ -325,12 +323,12 @@ export default function DailyExercises() {
       completed: false,
     } : {
       id: 3,
-      name: t("upper_body_focus"),
+      name: "Upper Body Focus",
       type: t("strength"),
       duration: 25,
       difficulty: t("intermediate"),
       calories: 200,
-      equipment: t("gym_required"),
+      equipment: "Gym Required",
       exercises: [
         {
           name: t("pull_ups"),
@@ -435,9 +433,9 @@ export default function DailyExercises() {
     } else if (equipment?.includes("yoga") || equipment?.includes("mat")) {
       return "🧘"
     } else if (equipment?.includes("none") || equipment?.includes("minimal")) {
-      return "💪"
+      return "🌟"
     } else {
-      return "⚡"
+      return "🔷"
     }
   }
 
@@ -478,41 +476,23 @@ export default function DailyExercises() {
     setSelectedWorkout(null)
   }
 
-  if (showPostureChecker) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">{t("posture_analysis")}</h2>
-          <Button onClick={() => setShowPostureChecker(false)} variant="outline">
-            {t("back_to_exercises")}
-          </Button>
-        </div>
-        <PostureChecker />
-      </div>
-    )
-  }
+
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-4">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
-          {t("daily_exercises")}
+          {t("daily exercises")}
         </h2>
         <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          {t("daily_desc")}
+          {t("daily desc")}
         </p>
       </div>
 
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-4 justify-center">
-        <Button
-          onClick={() => setShowPostureChecker(true)}
-          className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
-        >
-          <Camera className="h-4 w-4 mr-2" />
-          {t("analyze_form", "Analyze My Form")}
-        </Button>
+        {/* Analyze form button removed */}
       </div>
 
       {isWorkoutActive && selectedWorkout ? (
@@ -583,9 +563,7 @@ export default function DailyExercises() {
                     <CheckCircle className="h-4 w-4 mr-2" />
                     {t("complete_exercise", "Complete Exercise")}
                   </Button>
-                  <Button onClick={() => setShowPostureChecker(true)} variant="outline">
-                    <Camera className="h-4 w-4" />
-                  </Button>
+                  {/* Exercise correction button removed */}
                   <Button onClick={resetWorkout} variant="outline">
                     <RotateCcw className="h-4 w-4" />
                   </Button>
@@ -801,10 +779,7 @@ export default function DailyExercises() {
                                 <Play className="h-4 w-4 mr-2" />
                                 {t("start_workout", "Start Workout")}
                               </Button>
-                              <Button onClick={() => setShowPostureChecker(true)} variant="outline">
-                                <Camera className="h-4 w-4 mr-2" />
-                                {t("check_form", "Check Form")}
-                              </Button>
+                              {/* Exercise correction button removed */}
                             </div>
                           </div>
                         </DialogContent>

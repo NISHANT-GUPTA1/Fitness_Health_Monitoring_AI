@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog"
 import { Search, Filter, BookOpen, Target, Zap } from "lucide-react"
 import PostureChecker from "./PostureChecker"
+import ExerciseCorrectionJS from "./ExerciseCorrectionJS"
 
 export default function GymMachineGuide() {
   const { t } = useTranslation()
@@ -31,6 +32,7 @@ export default function GymMachineGuide() {
     muscleGroups: string[]
   } | null>(null)
   const [showPostureChecker, setShowPostureChecker] = useState(false)
+  const [showExerciseCorrection, setShowExerciseCorrection] = useState(false)
 
   const gymMachines = [
     {
@@ -248,6 +250,25 @@ export default function GymMachineGuide() {
       </div>
     )
   }
+  
+  if (showExerciseCorrection) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">{t("exercise_correction", "Exercise Correction")}</h2>
+          <Button 
+            onClick={() => {
+              setShowExerciseCorrection(false)
+            }} 
+            variant="outline"
+          >
+            {t("back_to_machines", "Back to Machines")}
+          </Button>
+        </div>
+        <ExerciseCorrectionJS />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -275,6 +296,16 @@ export default function GymMachineGuide() {
         >
           <Target className="h-4 w-4 mr-2" />
           {t("check_form", "Check My Form")}
+        </Button>
+        
+        <Button
+          onClick={() => {
+            setShowExerciseCorrection(true)
+          }}
+          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+        >
+          <Zap className="h-4 w-4 mr-2" />
+          {t("exercise_correction", "Exercise Correction")}
         </Button>
       </div>
 

@@ -1,0 +1,39 @@
+{
+  "exercise correction": "Exercise Correction",
+  "exercise correction description": "Get real-time feedback on your exercise form using AI",
+  "check my form": "Check My Form",
+  "ai posture analysis": "AI-powered posture analysis",
+  "select exercise": "Select exercise",
+  "start camera": "Start Camera",
+  "stop camera": "Stop Camera",
+  "camera access error": "Error accessing camera. Please check permissions.",
+  "push up": "Push-up",
+  "squat": "Squat",
+  "sit up": "Sit-up",
+  "pull up": "Pull-up",
+  "walking": "Walking",
+  "reps": "Reps",
+  "analyzing": "Analyzing...",
+  "reset": "Reset Counter",
+  "exercise tips": "Exercise Tips",
+  
+  "push up tip 1": "Keep your body in a straight line from head to heels",
+  "push up tip 2": "Position hands slightly wider than shoulder-width",
+  "push up tip 3": "Lower until your chest nearly touches the ground",
+  
+  "squat tip 1": "Keep weight in your heels and mid-foot",
+  "squat tip 2": "Keep knees in line with toes, not caving inward",
+  "squat tip 3": "Maintain a neutral spine position throughout",
+  
+  "sit up tip 1": "Keep your feet flat on the ground",
+  "sit up tip 2": "Cross arms over chest or place hands lightly behind ears",
+  "sit up tip 3": "Engage your core throughout the movement",
+  
+  "pull up tip 1": "Grip the bar with hands wider than shoulder-width",
+  "pull up tip 2": "Pull your chest to the bar, not just your chin",
+  "pull up tip 3": "Engage your back muscles and maintain straight body position",
+  
+  "walking tip 1": "Keep your head up and shoulders back",
+  "walking tip 2": "Let your arms swing naturally at your sides",
+  "walking tip 3": "Maintain a consistent stride length and cadence"
+}

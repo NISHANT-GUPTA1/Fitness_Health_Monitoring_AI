@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercise Posture Detection</title>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    .container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+    .input_video {
+      display: none;
+    }
+    .output_canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #feedback {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #fff;
+      font-size: 2.5em;
+      font-family: Arial, sans-serif;
+      text-shadow: 2px 2px 8px #000;
+      z-index: 100;
+    }
+    #controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0,0,0,0.5);
+      padding: 10px;
+      border-radius: 10px;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      z-index: 100;
+    }
+    button {
+      margin: 5px;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <video class="input_video"></video>
+    <canvas class="output_canvas" width="1280" height="720"></canvas>
+    <div id="feedback"></div>
+    <div id="controls">
+      <p>Select Exercise Mode:</p>
+      <button onclick="setMode('Squat')">Squat</button>
+      <button onclick="setMode('Push-up')">Push-up</button>
+      <button onclick="setMode('Bicep Curl')">Bicep Curl</button>
+      <button onclick="setMode('Plank')">Plank</button>
+      <button onclick="setMode('Lunge')">Lunge</button>
+      <button onclick="setMode(null)">All Exercises</button>
+      <hr>
+      <div>
+        <p>Rep Count: <span id="repCountDisplay">0</span></p>
+        <button onclick="resetReps()" style="background-color: #ff5722;">Reset Reps</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Function to set exercise mode via buttons
+    function setMode(mode) {
+      window.activeExerciseMode = mode;
+      window.exerciseConfidence = 0;
+      console.log(`Set mode to: ${mode || 'All exercises'}`);
+      
+      // Reset rep counter when changing exercises
+      resetReps();
+      
+      // Update button styles
+      const buttons = document.querySelectorAll('#controls button');
+      buttons.forEach(btn => {
+        if ((mode === null && btn.innerText === 'All Exercises') || 
+            (mode !== null && btn.innerText.includes(mode))) {
+          btn.style.backgroundColor = '#ff9800';
+        } else if (btn.innerText !== 'Reset Reps') {
+          btn.style.backgroundColor = '#4CAF50';
+        }
+      });
+    }
+    
+    // Function to reset rep counter
+    function resetReps() {
+      if (window.resetRepCounter) {
+        window.resetRepCounter();
+        document.getElementById('repCountDisplay').innerText = '0';
+      }
+    }
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

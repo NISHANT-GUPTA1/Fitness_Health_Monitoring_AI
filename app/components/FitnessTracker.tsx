@@ -151,7 +151,7 @@ export default function FitnessTracker() {
       {/* Header */}
       <div className="text-center space-y-4">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-          {t("fitness_tracker", "Fitness Tracker")}
+          {t("fitness tracker", "Fitness Tracker")}
         </h2>
         <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
           {t("tracker_desc", "Track your progress, monitor your goals, and stay motivated on your fitness journey.")}

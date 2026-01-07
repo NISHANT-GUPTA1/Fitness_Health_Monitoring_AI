@@ -9,7 +9,84 @@ import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar, Clock, Target, Zap, Plus, Edit, Play, CheckCircle, Save, Trash2 } from "lucide-react"
+import { Calendar, Clock, Target, Zap, Plus, Edit, Play, CheckCircle, Save, Trash2, Accessibility } from "lucide-react"
+import { generateWorkoutPlan as generateGemmaWorkoutPlan, generateAdaptiveWorkoutPlan } from "@/lib/gemma-api"
+import AdaptiveWorkoutPlanner from "./AdaptiveWorkoutPlanner"
+
+// Diet Planner logic from DietPlanner.tsx
+import React from "react";
+type DietType = "veg" | "non-veg" | "vegan";
+type Lifestyle = "balanced" | "junk food" | "salad" | "sweets";
+type Frequency = "never" | "rarely" | "sometimes" | "often" | "daily";
+type Preference = {
+  dietType: DietType;
+  allergies: string[];
+  lifestyle: Lifestyle;
+  junkFoodFreq: Frequency;
+  sweetsFreq: Frequency;
+  saladFreq: Frequency;
+};
+type DietPlan = {
+  [day: string]: {
+    breakfast: string;
+    lunch: string;
+    dinner: string;
+  };
+};
+const mealOptions = {
+  veg: {
+    breakfast: ["Poha", "Upma", "Oats", "Fruit Salad"],
+    lunch: ["Dal Rice", "Paneer Curry", "Veg Biryani", "Chole Chawal"],
+    dinner: ["Mixed Veg Curry", "Palak Paneer", "Rajma Rice", "Khichdi"],
+  },
+  "non-veg": {
+    breakfast: ["Egg Omelette", "Chicken Sandwich", "Oats", "Fruit Salad"],
+    lunch: ["Chicken Curry Rice", "Fish Fry", "Egg Biryani", "Paneer Curry"],
+    dinner: ["Grilled Chicken", "Fish Curry", "Egg Curry", "Dal Rice"],
+  },
+  vegan: {
+    breakfast: ["Vegan Smoothie", "Oats with Almond Milk", "Fruit Salad", "Chia Pudding"],
+    lunch: ["Vegan Buddha Bowl", "Chickpea Salad", "Veg Biryani", "Tofu Stir Fry"],
+    dinner: ["Lentil Soup", "Vegan Curry", "Quinoa Salad", "Stuffed Peppers"],
+  },
+  salad: ["Greek Salad", "Caesar Salad", "Fruit Salad", "Chickpea Salad"],
+  junk: ["Pizza", "Burger", "Fries", "Fried Rice"],
+  sweets: ["Gulab Jamun", "Ice Cream", "Brownie", "Fruit Custard"],
+};
+const pick = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
+function generateDietPlan(pref: Preference): DietPlan {
+  const days = [
+    "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+  ];
+  const plan: DietPlan = {};
+  for (const day of days) {
+    let base = mealOptions[pref.dietType];
+    const salad =
+      pref.saladFreq === "often" || pref.saladFreq === "daily"
+        ? pick(mealOptions.salad)
+        : undefined;
+    const junk =
+      pref.junkFoodFreq === "often" || pref.junkFoodFreq === "daily"
+        ? pick(mealOptions.junk)
+        : undefined;
+    const sweet =
+      pref.sweetsFreq === "often" || pref.sweetsFreq === "daily"
+        ? pick(mealOptions.sweets)
+        : undefined;
+    const filterAllergies = (meal: string) =>
+      !pref.allergies.some((allergy) =>
+        meal.toLowerCase().includes(allergy.toLowerCase())
+      );
+    let breakfast = pick(base.breakfast.filter(filterAllergies));
+    let lunch = pick(base.lunch.filter(filterAllergies));
+    let dinner = pick(base.dinner.filter(filterAllergies));
+    if (salad && Math.random() > 0.5) lunch = salad;
+    if (junk && Math.random() > 0.7) dinner = junk;
+    if (sweet && Math.random() > 0.7) dinner += " + " + sweet;
+    plan[day] = { breakfast, lunch, dinner };
+  }
+  return plan;
+}
 import PostureChecker from "./PostureChecker"
 
 export default function WorkoutPlanner() {
@@ -31,17 +108,37 @@ export default function WorkoutPlanner() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [isStarting, setIsStarting] = useState(false)
   const [activeTab, setActiveTab] = useState("create")
+  const [usedFallback, setUsedFallback] = useState(false)
+  // Diet Planner state
+  const [dietType, setDietType] = useState<DietType>("veg");
+  const [allergies, setAllergies] = useState<string>("");
+  const [lifestyle, setLifestyle] = useState<Lifestyle>("balanced");
+  const [junkFoodFreq, setJunkFoodFreq] = useState<Frequency>("rarely");
+  const [sweetsFreq, setSweetsFreq] = useState<Frequency>("rarely");
+  const [saladFreq, setSaladFreq] = useState<Frequency>("rarely");
+  const [showDietPlan, setShowDietPlan] = useState(false);
+  const [dietPlanResult, setDietPlanResult] = useState<any>(null);
   const [isCustomizing, setIsCustomizing] = useState(false)
+  
+  // Adaptive workout state
+  const [showAdaptiveWorkout, setShowAdaptiveWorkout] = useState(false)
+  const [adaptiveOptions, setAdaptiveOptions] = useState<any>(null)
+  
+  // Disability options state
+  const [hasDisability, setHasDisability] = useState(false)
+  const [disabilityType, setDisabilityType] = useState<string>("")
+  const [disabilityLevel, setDisabilityLevel] = useState<string>("moderate")
+  const [specificNeeds, setSpecificNeeds] = useState("")
 
   // Remove the local localStorage effects since they're handled in context
 
   const fitnessGoals = [
-    { id: "weight-loss", label: "Weight Loss", icon: "🔥" },
-    { id: "muscle-gain", label: "Muscle Gain", icon: "💪" },
-    { id: "endurance", label: "Endurance", icon: "🏃" },
-    { id: "strength", label: "Strength", icon: "🏋️" },
+    { id: "weight-loss", label: "Weight Loss", icon: "⚖️" },
+    { id: "muscle-gain", label: "Muscle Gain", icon: "🏋️" },
+    { id: "endurance", label: "Endurance", icon: "🏃‍♂️" },
+    { id: "strength", label: "Strength", icon: "💎" },
     { id: "flexibility", label: "Flexibility", icon: "🧘" },
-    { id: "general-fitness", label: "General Fitness", icon: "⚡" },
+    { id: "general-fitness", label: "General Fitness", icon: "🎯" },
   ]
 
   const weekDays = [
@@ -144,26 +241,92 @@ export default function WorkoutPlanner() {
   }
 
   const handleGoalToggle = (goalId: string) => {
-    setSelectedGoals((prev) => (prev.includes(goalId) ? prev.filter((id) => id !== goalId) : [...prev, goalId]))
+    setSelectedGoals((prev) => {
+      // Define conflicting goals
+      const conflicts: Record<string, string[]> = {
+        'weight-loss': ['muscle-gain'], // Weight loss conflicts with muscle gain
+        'muscle-gain': ['weight-loss'], // Muscle gain conflicts with weight loss
+        'strength': ['endurance'], // Strength focus conflicts with endurance focus
+        'endurance': ['strength'], // Endurance focus conflicts with strength focus
+      }
+
+      // If goal is already selected, remove it
+      if (prev.includes(goalId)) {
+        return prev.filter((id) => id !== goalId)
+      }
+
+      // Check if adding this goal would conflict with existing goals
+      const conflictingGoals = conflicts[goalId] || []
+      const hasConflict = prev.some(existingGoal => conflictingGoals.includes(existingGoal))
+
+      if (hasConflict) {
+        // Remove conflicting goals and add the new one
+        const filteredGoals = prev.filter(existingGoal => !conflictingGoals.includes(existingGoal))
+        return [...filteredGoals, goalId]
+      }
+
+      // No conflicts, just add the goal
+      return [...prev, goalId]
+    })
   }
 
   const handleDayToggle = (dayId: string) => {
     setWorkoutDays((prev) => (prev.includes(dayId) ? prev.filter((id) => id !== dayId) : [...prev, dayId]))
   }
 
+  // Generate workout plan using API
   const generateWorkoutPlan = async () => {
-    setIsGenerating(true)
-
-    // Simulate AI generation
-    await new Promise((resolve) => setTimeout(resolve, 3000))
-
-    // Generate plan based on user selections
-    const customPlan = createCustomWorkoutPlan()
-    setGeneratedPlan(customPlan)
-    setIsGenerating(false)
-    
-    // Reset customization state after generating new plan
-    setIsCustomizing(false)
+    setIsGenerating(true);
+    try {
+      console.log("⚙️ Generating workout plan with parameters:", {
+        goals: selectedGoals,
+        fitnessLevel,
+        workoutDays,
+        sessionDuration,
+        hasDisability,
+        disabilityType: hasDisability ? disabilityType : undefined,
+        disabilityLevel: hasDisability ? disabilityLevel : undefined,
+        specificNeeds: hasDisability ? specificNeeds : undefined
+      });
+      
+      const plan = await generateGemmaWorkoutPlan(
+        selectedGoals,
+        fitnessLevel,
+        workoutDays,
+        sessionDuration,
+        hasDisability,
+        disabilityType,
+        disabilityLevel,
+        specificNeeds
+      );
+      
+      console.log("📊 Received workout plan:", plan);
+      
+      // Validate plan structure
+      if (plan && typeof plan === 'object' && plan.schedule && Array.isArray(plan.schedule)) {
+        // Ensure all days have the required properties
+        plan.schedule = plan.schedule.map((day: any) => ({
+          day: day.day || "Unknown",
+          type: day.type || "Workout",
+          duration: day.duration || getDurationFromSelection(),
+          exercises: Array.isArray(day.exercises) ? day.exercises : [],
+          calories: day.calories || 0
+        }));
+        
+        setGeneratedPlan(plan);
+        setUsedFallback(false);
+      } else {
+        console.error("❌ Invalid plan structure received from API");
+        throw new Error("Invalid workout plan structure received from API");
+      }
+    } catch (e) {
+      console.error("❌ Error generating workout plan:", e);
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      alert("Failed to generate workout plan: " + errorMessage + "\\n\\nPlease check your OpenRouter API key in .env.local");
+    } finally {
+      setIsGenerating(false);
+      setIsCustomizing(false);
+    }
   }
 
   const createCustomWorkoutPlan = () => {
@@ -487,7 +650,8 @@ export default function WorkoutPlanner() {
     }, 1000)
   }
 
-  const getDayTypeColor = (type: string) => {
+  const getDayTypeColor = (type: string | undefined) => {
+    if (!type) return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
     if (type.includes("Strength")) return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
     if (type.includes("Cardio")) return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
     if (type.includes("Rest")) return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
@@ -525,10 +689,275 @@ export default function WorkoutPlanner() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
+        <TabsList className="grid w-full grid-cols-4 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
           <TabsTrigger value="create">{t("create_plan", "Create Plan")}</TabsTrigger>
           <TabsTrigger value="my-plans">{t("my_plans", "My Plans")}</TabsTrigger>
+          <TabsTrigger value="diet-planner">{t("diet_planner", "Diet Planner")}</TabsTrigger>
+          <TabsTrigger value="adaptive">{t("adaptive_workout", "Adaptive Workout")}</TabsTrigger>
         </TabsList>
+        {/* Diet Planner Tab */}
+        <TabsContent value="diet-planner" className="space-y-6">
+          <div className="max-w-2xl mx-auto bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 mt-4">
+            <h2 className="text-2xl font-bold mb-6 text-center text-blue-600 dark:text-blue-300">Personalized Weekly Diet Planner</h2>
+            <form className="space-y-4">
+              <div className="flex flex-col md:flex-row md:items-center gap-2">
+                <label className="font-medium w-40">Diet Type:</label>
+                <select
+                  title="Diet Type"
+                  className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white"
+                  value={dietType}
+                  onChange={e => setDietType(e.target.value as DietType)}
+                >
+                  <option value="veg">Vegetarian</option>
+                  <option value="non-veg">Non-Vegetarian</option>
+                  <option value="vegan">Vegan</option>
+                </select>
+              </div>
+              <div className="flex flex-col md:flex-row md:items-center gap-2">
+                <label className="font-medium w-40">Allergies (comma separated):</label>
+                <input
+                  className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white"
+                  type="text"
+                  value={allergies}
+                  onChange={e => setAllergies(e.target.value)}
+                  placeholder="e.g. nuts, dairy"
+                />
+              </div>
+              <div className="flex flex-col md:flex-row md:items-center gap-2">
+                <label className="font-medium w-40">Lifestyle:</label>
+                <select
+                  title="Lifestyle"
+                  className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white"
+                  value={lifestyle}
+                  onChange={e => setLifestyle(e.target.value as Lifestyle)}
+                >
+                  <option value="balanced">Balanced</option>
+                  <option value="junk food">Junk Food Lover</option>
+                  <option value="salad">Salad Lover</option>
+                  <option value="sweets">Sweets Lover</option>
+                </select>
+              </div>
+              <div className="flex flex-col md:flex-row md:items-center gap-2">
+                <label className="font-medium w-40">Junk Food Frequency:</label>
+                <select
+                  title="Junk Food Frequency"
+                  className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white"
+                  value={junkFoodFreq}
+                  onChange={e => setJunkFoodFreq(e.target.value as Frequency)}
+                >
+                  <option value="never">Never</option>
+                  <option value="rarely">Rarely</option>
+                  <option value="sometimes">Sometimes</option>
+                  <option value="often">Often</option>
+                  <option value="daily">Daily</option>
+                </select>
+              </div>
+              <div className="flex flex-col md:flex-row md:items-center gap-2">
+                <label className="font-medium w-40">Sweets Frequency:</label>
+                <select
+                  title="Sweets Frequency"
+                  className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white"
+                  value={sweetsFreq}
+                  onChange={e => setSweetsFreq(e.target.value as Frequency)}
+                >
+                  <option value="never">Never</option>
+                  <option value="rarely">Rarely</option>
+                  <option value="sometimes">Sometimes</option>
+                  <option value="often">Often</option>
+                  <option value="daily">Daily</option>
+                </select>
+              </div>
+              <div className="flex flex-col md:flex-row md:items-center gap-2">
+                <label className="font-medium w-40">Salad Frequency:</label>
+                <select
+                  title="Salad Frequency"
+                  className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white"
+                  value={saladFreq}
+                  onChange={e => setSaladFreq(e.target.value as Frequency)}
+                >
+                  <option value="never">Never</option>
+                  <option value="rarely">Rarely</option>
+                  <option value="sometimes">Sometimes</option>
+                  <option value="often">Often</option>
+                  <option value="daily">Daily</option>
+                </select>
+              </div>
+              <button
+                type="button"
+                onClick={async () => {
+                  setShowDietPlan(true);
+                  setIsGenerating(true);
+                  try {
+                    // Import the generateDietPlan function dynamically
+                    const { generateDietPlan } = await import("@/lib/gemma-api");
+                    const plan = await generateDietPlan(
+                      dietType,
+                      allergies,
+                      lifestyle,
+                      junkFoodFreq,
+                      sweetsFreq,
+                      saladFreq
+                    );
+                    
+                    // Validate plan structure
+                    if (plan && typeof plan === 'object') {
+                      // Ensure plan has all required days
+                      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+                      const validatedPlan: Record<string, { breakfast: string; lunch: string; dinner: string }> = {};
+                      let isUsingFallback = false;
+                      
+                      // Process each day and ensure it has all meal types
+                      days.forEach(day => {
+                        const dayPlan = plan[day] || {};
+                        if (!plan[day]) isUsingFallback = true;
+                        
+                        validatedPlan[day] = {
+                          breakfast: dayPlan.breakfast || "Balanced meal based on your preferences",
+                          lunch: dayPlan.lunch || "Balanced meal based on your preferences",
+                          dinner: dayPlan.dinner || "Balanced meal based on your preferences"
+                        };
+                      });
+                      
+                      // Track if we had to use fallbacks
+                      if (isUsingFallback || plan._usedFallback) {
+                        console.warn("⚠️ Diet plan using fallback values");
+                        setUsedFallback(true);
+                      } else {
+                        setUsedFallback(false);
+                      }
+                      
+                      setDietPlanResult(validatedPlan);
+                    } else {
+                      console.error("Invalid diet plan structure:", plan);
+                      alert("Could not parse diet plan from AI response.");
+                    }
+                  } catch (e) {
+                    console.error("Failed to generate diet plan:", e);
+                    alert("Failed to generate diet plan. Please try again.");
+                  } finally {
+                    setIsGenerating(false);
+                  }
+                }}
+                className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow transition-colors"
+                disabled={isGenerating}
+              >
+                {isGenerating ? "Generating..." : "Generate Diet Plan"}
+              </button>
+            </form>
+            {showDietPlan && dietPlanResult && (
+              <>
+                <div className="mt-8 bg-blue-50 dark:bg-gray-800 rounded-lg p-4">
+                  <strong className="block text-lg text-blue-700 dark:text-blue-300 mb-2">Your Preferences:</strong>
+                  <div className="text-gray-700 dark:text-gray-200">Diet Type: <span className="font-medium">{dietType}</span></div>
+                  <div className="text-gray-700 dark:text-gray-200">Allergies: <span className="font-medium">{allergies ? allergies : "None"}</span></div>
+                  <div className="text-gray-700 dark:text-gray-200">Lifestyle: <span className="font-medium">{lifestyle}</span></div>
+                  <div className="text-gray-700 dark:text-gray-200">Junk Food: <span className="font-medium">{junkFoodFreq}</span></div>
+                  <div className="text-gray-700 dark:text-gray-200">Sweets: <span className="font-medium">{sweetsFreq}</span></div>
+                  <div className="text-gray-700 dark:text-gray-200">Salad: <span className="font-medium">{saladFreq}</span></div>
+                </div>
+                
+                {usedFallback && (
+                  <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md text-amber-700">
+                    <div className="flex items-start">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <p className="font-medium">Diet plan partially generated</p>
+                        <p className="text-sm mt-1">Some meals were filled in with balanced options. Try generating again for a more personalized plan.</p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUsedFallback(false);
+                            setDietPlanResult(null);
+                            setShowDietPlan(false);
+                            setTimeout(async () => {
+                              setIsGenerating(true);
+                              try {
+                                const { generateDietPlan } = await import("@/lib/gemma-api");
+                                const plan = await generateDietPlan(
+                                  dietType,
+                                  allergies,
+                                  lifestyle,
+                                  junkFoodFreq,
+                                  sweetsFreq,
+                                  saladFreq
+                                );
+                                
+                                if (plan && typeof plan === 'object') {
+                                  // Check if the API indicated it used fallback values
+                                  if (plan._usedFallback) {
+                                    console.warn("⚠️ API used fallback values for diet plan");
+                                    setUsedFallback(true);
+                                  }
+                                  
+                                  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+                                  const validatedPlan: Record<string, { breakfast: string; lunch: string; dinner: string }> = {};
+                                  let isUsingFallback = false;
+                                  
+                                  days.forEach(day => {
+                                    const dayPlan = plan[day] || {};
+                                    if (!plan[day]) isUsingFallback = true;
+                                    
+                                    validatedPlan[day] = {
+                                      breakfast: dayPlan.breakfast || "Balanced meal based on your preferences",
+                                      lunch: dayPlan.lunch || "Balanced meal based on your preferences",
+                                      dinner: dayPlan.dinner || "Balanced meal based on your preferences"
+                                    };
+                                  });
+                                  
+                                  if (isUsingFallback) {
+                                    console.warn("⚠️ Diet plan missing some days, using fallback values");
+                                    setUsedFallback(true);
+                                  } else {
+                                    setUsedFallback(false);
+                                  }
+                                  
+                                  setDietPlanResult(validatedPlan);
+                                  setShowDietPlan(true);
+                                }
+                              } catch (e) {
+                                console.error("Failed to generate diet plan:", e);
+                                alert("Failed to generate diet plan. Please try again.");
+                              } finally {
+                                setIsGenerating(false);
+                              }
+                            }, 100);
+                          }}
+                          className="mt-2 px-3 py-1 text-sm border border-amber-200 rounded bg-white text-amber-700 hover:bg-amber-50"
+                        >
+                          Try generating again
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div className="overflow-x-auto mt-8">
+                  <table className="min-w-full border border-blue-200 dark:border-gray-700 rounded-lg overflow-hidden shadow">
+                    <thead className="bg-blue-100 dark:bg-gray-700">
+                      <tr>
+                        <th className="py-2 px-4 border-b border-blue-200 dark:border-gray-600 text-left text-blue-800 dark:text-blue-200">Day</th>
+                        <th className="py-2 px-4 border-b border-blue-200 dark:border-gray-600 text-left text-blue-800 dark:text-blue-200">Breakfast</th>
+                        <th className="py-2 px-4 border-b border-blue-200 dark:border-gray-600 text-left text-blue-800 dark:text-blue-200">Lunch</th>
+                        <th className="py-2 px-4 border-b border-blue-200 dark:border-gray-600 text-left text-blue-800 dark:text-blue-200">Dinner</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(dietPlanResult).map(([day, meals]: any) => (
+                        <tr key={day} className="even:bg-blue-50 dark:even:bg-gray-800">
+                          <td className="py-2 px-4 border-b border-blue-100 dark:border-gray-700 font-semibold">{day}</td>
+                          <td className="py-2 px-4 border-b border-blue-100 dark:border-gray-700">{meals.breakfast}</td>
+                          <td className="py-2 px-4 border-b border-blue-100 dark:border-gray-700">{meals.lunch}</td>
+                          <td className="py-2 px-4 border-b border-blue-100 dark:border-gray-700">{meals.dinner}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </div>
+        </TabsContent>
 
         {/* Create Plan Tab */}
         <TabsContent value="create" className="space-y-6">
@@ -580,6 +1009,80 @@ export default function WorkoutPlanner() {
                         <SelectItem value="advanced">{t("advanced", "Advanced")}</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                  
+                  {/* Accessibility Options */}
+                  <div className="space-y-3 border-t border-orange-200 dark:border-orange-700 pt-3 mt-4">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-base font-medium flex items-center">
+                        <Accessibility className="h-5 w-5 mr-2 text-orange-600" />
+                        {t("accessibility_options", "Accessibility Options")}
+                      </Label>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="disability-toggle"
+                          title="Disability Toggle"
+                          checked={hasDisability}
+                          onChange={(e) => {
+                            setHasDisability(e.target.checked);
+                            if (!e.target.checked) setDisabilityType("");
+                          }}
+                          className="mr-2 h-4 w-4"
+                        />
+                        <Label htmlFor="disability-toggle" className="text-sm">
+                          {t("has_disability", "I have a disability")}
+                        </Label>
+                      </div>
+                    </div>
+                    
+                    {hasDisability && (
+                      <div className="space-y-3 bg-orange-50 dark:bg-orange-900/20 p-3 rounded-lg">
+                        <div className="space-y-2">
+                          <Label htmlFor="disability-type">{t("disability_type", "Type of Disability")}</Label>
+                          <Select value={disabilityType} onValueChange={setDisabilityType}>
+                            <SelectTrigger id="disability-type">
+                              <SelectValue placeholder={t("select_disability_type", "Select type...")} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="upper_body">{t("upper_body", "Upper Body Disability")}</SelectItem>
+                              <SelectItem value="lower_body">{t("lower_body", "Lower Body Disability")}</SelectItem>
+                              <SelectItem value="mobility">{t("mobility_impairment", "General Mobility Impairment")}</SelectItem>
+                              <SelectItem value="visual">{t("visual_impairment", "Visual Impairment")}</SelectItem>
+                              <SelectItem value="hearing">{t("hearing_impairment", "Hearing Impairment")}</SelectItem>
+                              <SelectItem value="cognitive">{t("cognitive_disability", "Cognitive Disability")}</SelectItem>
+                              <SelectItem value="other">{t("other", "Other")}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="disability-level">{t("disability_level", "Disability Level")}</Label>
+                          <Select value={disabilityLevel} onValueChange={setDisabilityLevel}>
+                            <SelectTrigger id="disability-level">
+                              <SelectValue placeholder={t("select_level", "Select level...")} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="mild">{t("mild", "Mild")}</SelectItem>
+                              <SelectItem value="moderate">{t("moderate", "Moderate")}</SelectItem>
+                              <SelectItem value="severe">{t("severe", "Severe")}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="specific-needs">{t("specific_needs", "Specific Needs")}</Label>
+                          <textarea
+                            id="specific-needs"
+                            value={specificNeeds}
+                            onChange={(e) => setSpecificNeeds(e.target.value)}
+                            className="w-full p-2 border rounded-md text-sm dark:bg-gray-700"
+                            rows={2}
+                            placeholder={t("describe_needs", "Describe any specific workout adaptations needed...")}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Workout Days */}
@@ -714,6 +1217,34 @@ export default function WorkoutPlanner() {
                       </div>
                     </div>
                   </div>
+                  
+                  {usedFallback && (
+                    <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md text-amber-700">
+                      <div className="flex items-start">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        <div>
+                          <p className="font-medium">We had trouble generating a fully custom plan</p>
+                          <p className="text-sm mt-1">We've created a plan that matches your goals, but some details may be general. Try again or customize this plan to make it more personal.</p>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="mt-2 text-amber-700 border-amber-200 hover:bg-amber-100"
+                            onClick={() => {
+                              setUsedFallback(false);
+                              setGeneratedPlan(null);
+                              setTimeout(() => {
+                                generateWorkoutPlan();
+                              }, 100);
+                            }}
+                          >
+                            Try generating again
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent>
                   <div className="flex space-x-4">
@@ -752,13 +1283,14 @@ export default function WorkoutPlanner() {
 
               {/* Weekly Schedule */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {generatedPlan.schedule.map((day: any, index: number) => (
-                  <Card key={index} className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">{day.day}</CardTitle>
-                        <Badge className={getDayTypeColor(day.type)}>{day.type}</Badge>
-                      </div>
+                {generatedPlan && generatedPlan.schedule && Array.isArray(generatedPlan.schedule) ? 
+                  generatedPlan.schedule.map((day: any, index: number) => (
+                    <Card key={index} className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">{day.day}</CardTitle>
+                          <Badge className={getDayTypeColor(day.type)}>{day.type}</Badge>
+                        </div>
                       <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
                         <div className="flex items-center space-x-1">
                           <Clock className="h-4 w-4" />
@@ -771,7 +1303,7 @@ export default function WorkoutPlanner() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      {day.exercises.length > 0 ? (
+                      {day.exercises && day.exercises.length > 0 ? (
                         <div className="space-y-2">
                           {day.exercises.slice(0, 3).map((exercise: any, exerciseIndex: number) => (
                             <div key={exerciseIndex} className="text-sm">
@@ -790,10 +1322,25 @@ export default function WorkoutPlanner() {
                       )}
                     </CardContent>
                   </Card>
-                ))}
+                )) : (
+                  <div className="col-span-full p-8 text-center">
+                    <div className="animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800 p-6">
+                      <p className="text-gray-500 dark:text-gray-400">
+                        {t("loading_plan", "Loading workout plan...")}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
+        </TabsContent>
+
+        {/* Adaptive Workout Tab */}
+        <TabsContent value="adaptive" className="space-y-6">
+          <div className="max-w-4xl mx-auto">
+            <AdaptiveWorkoutPlanner />
+          </div>
         </TabsContent>
 
         {/* My Plans Tab */}

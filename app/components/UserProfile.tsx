@@ -34,17 +34,17 @@ export default function UserProfile() {
   const { t } = useTranslation()
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    age: 28,
+    firstName: "CodeX",
+    lastName: "",
+    email: "CodeX@gmail.com",
+    age: 21,
     height: 175, // cm
     weight: 70, // kg
     fitnessLevel: "intermediate",
     goals: ["weight-loss", "muscle-gain"],
-    location: "New York, NY",
+    location: "North Delhi, India",
     bio: "Fitness enthusiast looking to stay healthy and motivated!",
-    workoutSchedule: ["monday", "wednesday", "friday"],
+    workoutSchedule: ["monday", "Tuesday" ,"wednesday", "Thursday", "friday"],
     preferredWorkoutTime: "morning",
     equipment: ["dumbbells", "resistance-bands", "yoga-mat"],
   })
@@ -76,7 +76,7 @@ export default function UserProfile() {
     longestStreak: 28,
     averageWorkoutTime: 35,
     favoriteExercise: "Push-ups",
-    joinDate: "January 2024",
+    joinDate: "January 2026",
   }
 
   const achievements = [
@@ -86,7 +86,7 @@ export default function UserProfile() {
       description: "Complete your first workout",
       earned: true,
       date: "2024-01-15",
-      icon: "🏃",
+      icon: "�",
     },
     {
       id: 2,
@@ -94,7 +94,7 @@ export default function UserProfile() {
       description: "Complete 5 workouts in a week",
       earned: true,
       date: "2024-01-20",
-      icon: "💪",
+      icon: "🏆",
     },
     {
       id: 3,
@@ -118,7 +118,7 @@ export default function UserProfile() {
       description: "Burn 3000 calories in a day",
       earned: false,
       date: null,
-      icon: "🔥",
+      icon: "⭐",
     },
     {
       id: 6,
@@ -132,10 +132,10 @@ export default function UserProfile() {
 
   const recentActivity = [
     { date: "2024-01-22", type: "workout", description: "Completed Upper Body Strength", duration: 45, calories: 320 },
-    { date: "2024-01-21", type: "achievement", description: "Earned 'Week Warrior' badge", icon: "💪" },
+    { date: "2024-01-21", type: "achievement", description: "Earned 'Week Warrior' badge", icon: "🏆" },
     { date: "2024-01-20", type: "workout", description: "Completed Morning Cardio", duration: 30, calories: 280 },
     { date: "2024-01-19", type: "partner", description: "Connected with Sarah Johnson", icon: "👥" },
-    { date: "2024-01-18", type: "milestone", description: "Reached 150 total workouts", icon: "🎯" },
+    { date: "2024-01-18", type: "milestone", description: "Reached 150 total workouts", icon: "🏅" },
   ]
 
   const handleSaveProfile = () => {
