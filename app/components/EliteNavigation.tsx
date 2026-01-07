@@ -46,6 +46,11 @@ export default function EliteNavigation({ onNavigate }: EliteNavigationProps) {
     if (section === 'pose') {
       // Redirect to pose page
       window.location.href = '/pose';
+    } else if (section === 'pricing') {
+      // Navigate to pricing section
+      if (onNavigate) {
+        onNavigate('pricing');
+      }
     } else if (onNavigate) {
       onNavigate(section);
     }
@@ -127,7 +132,10 @@ export default function EliteNavigation({ onNavigate }: EliteNavigationProps) {
               </Button>
 
               {/* CTA Button */}
-              <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-6 rounded-full shadow-elite">
+              <Button 
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-6 rounded-full shadow-elite"
+                onClick={() => handleNavClick('pricing')}
+              >
                 Start Free Trial
               </Button>
             </div>
@@ -181,7 +189,13 @@ export default function EliteNavigation({ onNavigate }: EliteNavigationProps) {
                 </button>
               ))}
               <hr className="border-slate-200 dark:border-slate-700" />
-              <Button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-full">
+              <Button 
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-full"
+                onClick={() => {
+                  handleNavClick('pricing');
+                  setMobileMenuOpen(false);
+                }}
+              >
                 Start Free Trial
               </Button>
             </div>
